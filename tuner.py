@@ -25,7 +25,6 @@ def Determine_Sharp_Flat(Fin):
     print("sharp")
 
 #recording audio
-
 def audio_record():
     seconds = 5 #in seconds
     sampling_rate = 44100
@@ -57,13 +56,27 @@ def plot_graph(fourier, aud,t):
   plt.show()
   return
 
-while True:
-    #print(sd.query_devices()) used for debugging purposes;
+
+def continuous_running(determinant):
+  while (determinant == True):
+  #print(sd.query_devices()) used for debugging purposes;
     recording = audio_record()
     Time = np.linspace(0,len(recording), 1000, endpoint=True)
     dft = np.fft.fft(recording)
     dft = np.abs(dft)
     plot_graph(dft,recording, Time)
+    #do all the work
+    determinant = False
+    continuous_running(determinant)
+  while (determinant == False):
+    target = input("Please type in either S for start or Q for ending the program: s")
+    if (target.lower() == 's'):
+      determinant = True
+      continuous_running(determinant)
+    if (target.lower() == 'q'):
+      print("Exitting program")
+      return
     
-
-    break
+    
+    
+  
