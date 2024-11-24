@@ -2,7 +2,7 @@
 import sounddevice as sd
 import numpy as np
 import math
-import mathplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 #defined variables
 Notes = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
@@ -57,26 +57,27 @@ def plot_graph(fourier, aud,t):
   return
 
 
-def continuous_running(determinant):
-  while (determinant == True):
+def continuous_running():
+  while (True):
   #print(sd.query_devices()) used for debugging purposes;
     recording = audio_record()
     Time = np.linspace(0,len(recording), 1000, endpoint=True)
     dft = np.fft.fft(recording)
     dft = np.abs(dft)
+    print(dft)
     plot_graph(dft,recording, Time)
     #do all the work
     determinant = False
     continuous_running(determinant)
-  while (determinant == False):
-    target = input("Please type in either S for start or Q for ending the program: s")
-    if (target.lower() == 's'):
-      determinant = True
-      continuous_running(determinant)
-    if (target.lower() == 'q'):
-      print("Exitting program")
-      return
+#   while (determinant == False):
+#     target = input("Please type in either S for start or Q for ending the program: s")
+#     if (target.lower() == 's'):
+#       determinant = True
+#       continuous_running(determinant)
+#     if (target.lower() == 'q'):
+#       print("Exitting program")
+#       return
     
-    
+continuous_running() 
     
   
