@@ -26,49 +26,51 @@ def Determine_Sharp_Flat(Fin):
 
 #recording audio
 def audio_record():
-    seconds = 5 #in seconds
+    seconds = 1 #in seconds
     sampling_rate = 44100
     print("Start new recording. Play your note and wait for recording to finish")
-    audio = sd.rec(int(seconds*sampling_rate), samplerate=sampling_rate, channels = 2)
-    sd.wait()
+    audio = sd.rec(int(seconds*sampling_rate), samplerate=sampling_rate, channels = 2) #maybe need to change channels to 1
+    Time = np.linspace(0,seconds, len(audio))
     print("finished recording")
-    sd.play(audio, sampling_rate)
-    sd.wait()
-    return audio
+    # sd.play(audio, sampling_rate)
+    return audio, Time
 
-def plot_graph(fourier, aud,t):
-  fig = plt.subplot(2,1,1)
-#plot the time domain graph
-  fig.plot(t,aud)
-  fig.set_title("Time Domain Graph of Audio Recording")
-  fig.set_xlabel("Time")
-  fig.set_ylabel("Audio Recording")
+# def plot_graph(fourier, aud,t):
+#   fig = plt.subplot(2,1,1)
+# #plot the time domain graph
+#   fig.plot(t,aud)
+#   fig.set_title("Time Domain Graph of Audio Recording")
+#   fig.set_xlabel("Time")
+#   fig.set_ylabel("Audio Recording")
 
-#plot to the magnitude of the dft
-  frequency = np.fft.fftfreq(len(aud), (1/sampling_rate))
-  fig = plt.subplot(2,1,2)
-  fig.plot(frequency, fourier)
-  fig.set_title("Discrete Fourier Transfrom Magnitude")
-  fig.set_xlabel("Frequency in Hz")
-  fig.set_ylabel("Density/Magnitude")
-  #presenting the 2 graphs
-  plt.tight_layout()
-  plt.show()
-  return
+# #plot to the magnitude of the dft
+#   frequency = np.fft.fftfreq(len(aud), (1/sampling_rate))
+#   fig = plt.subplot(2,1,2)
+#   fig.plot(frequency, fourier)
+#   fig.set_title("Discrete Fourier Transfrom Magnitude")
+#   fig.set_xlabel("Frequency in Hz")
+#   fig.set_ylabel("Density/Magnitude")
+#   #presenting the 2 graphs
+#   plt.tight_layout()
+#   plt.show()
+#   return
+
+def compute_frequency(recording, t):
+    dft = np.fft.fft(recording)
+    dft = np.abs(dft)
+    print("dft")
+    print(dft)
+
 
 
 def continuous_running():
   while (True):
   #print(sd.query_devices()) used for debugging purposes;
-    recording = audio_record()
-    Time = np.linspace(0,len(recording), 1000, endpoint=True)
-    dft = np.fft.fft(recording)
-    dft = np.abs(dft)
-    print(dft)
-    plot_graph(dft,recording, Time)
+    recording, t = audio_record()
+    compute_frequency(recording, t)
+    # plot_graph(dft,recording, Time)
     #do all the work
-    determinant = False
-    continuous_running(determinant)
+
 #   while (determinant == False):
 #     target = input("Please type in either S for start or Q for ending the program: s")
 #     if (target.lower() == 's'):
