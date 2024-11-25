@@ -65,8 +65,8 @@ def Harmonic_Product_Spectrum(sig):
   for index in range(1,harmonic_number+1,1):
    length = math.ceil(sig.size/index)
    #potential place to debug
-   harmonic_product_spectrum_copy = np.multiply(harmonic_product_spectrum[:length],sig_copy[::index])
-   harmonic_product_spectrum = harmonic_product_spectrum_copy
+   #harmonic_product_spectrum_copy = np.multiply(harmonic_product_spectrum[:length],sig_copy[::index])
+   harmonic_product_spectrum[:length] *= sig_copy[::index]
   
   return harmonic_product_spectrum
 
