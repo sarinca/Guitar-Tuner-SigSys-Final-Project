@@ -36,10 +36,10 @@ def audio_record():
     print("Start new recording. Play your note and wait for recording to finish")
     audio = sd.rec(int(seconds*sampling_rate), samplerate=sampling_rate, channels = 1) #maybe need to change channels to 1
     sd.wait()
-    Time = np.linspace(0,seconds, len(audio))
+    #Time = np.linspace(0,seconds, len(audio))
     print("finished recording")
-    # sd.play(audio, sampling_rate)
-    return audio, Time
+    sd.play(audio, sampling_rate)
+    return audio
 
 # def plot_graph(fourier, aud,t):
 #   fig = plt.subplot(2,1,1)
@@ -103,8 +103,8 @@ def compute_fft(recording, t):
 def continuous_running():
   while (True):
   #print(sd.query_devices()) used for debugging purposes;
-    recording, t = audio_record()
-    transform = compute_fft(recording, t)
+    recording = audio_record()
+    transform = compute_fft(recording)
     print("dft array")
     print(transform)
     # plot_graph(dft,recording, Time)
