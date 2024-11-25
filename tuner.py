@@ -19,24 +19,21 @@ def Find_Closest_Note(Fin):
   return Note, closest_pitch
 
 def Determine_Sharp_Flat(Fin):
+  print(f"Input Frequency: {Fin}")
   note, close_pitch = Find_Closest_Note(Fin)
-  print("closest note")
-  print(note)
-  print("close pitch")
-  print(close_pitch)
+  print(f"Closest note: {note} ")
+  print(f"Closest pitch: {close_pitch}")
   if (Fin < close_pitch):
-    print("flat")
+    print("Flat")
   elif (Fin > close_pitch):
-    print("sharp")
+    print("Sharp")
 
 #recording audio
 def audio_record():
     seconds = 1 #in seconds
     sampling_rate = 48000
-    print("Start new recording. Play your note and wait for recording to finish")
     audio = sd.rec(int(seconds*sampling_rate), samplerate=sampling_rate, channels = 1) 
     sd.wait()
-    print("finished recording")
     sd.play(audio, sampling_rate)
     return audio
 
@@ -64,8 +61,6 @@ def continuous_running():
   while (True):
     recording = audio_record()
     transform = compute_fft(recording.flatten())
-    print("dft array")
-    print(transform)
     hps_result = Harmonic_Product_Spectrum(transform)
     
     frequencies = np.fft.fftfreq(int((len(hps_result)*2)/1), 1 / sampling_rate)[:len(transform)]
@@ -74,9 +69,6 @@ def continuous_running():
     
     max_index = np.argmax(hps_result)
     fundamental_frequency = frequencies[max_index]
-    
-    print("fundamental freq")
-    print(fundamental_frequency+40)
     Determine_Sharp_Flat(fundamental_frequency+40)
     
 continuous_running() 
