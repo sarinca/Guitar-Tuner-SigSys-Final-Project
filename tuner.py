@@ -93,8 +93,8 @@ def compute_fft(recording, t):
     # print("dft")
     # print(dft)
     main_hum_suppression_index = 61 #main hum corresponds to outside noise which needs to get zerod out, typically occurs between 50 to 60 hz 
-    # for index in range(61+1):
-    #    dft[index] = 0
+    for index in range(61+1):
+      dft[index] = 0
     return dft
 
 
@@ -111,8 +111,8 @@ def continuous_running():
     hps_result = Harmonic_Product_Spectrum(transform)
     max_hps_result = np.argmax(hps_result)
     print("max hps: ", max_hps_result)
-    fundamental_frequency = (sampling_rate*hps_result[max_hps_result]) / harmonic_number
-    # fundamental_frequency = (sampling_rate*max_hps_result) / len(transform)
+    #fundamental_frequency = (sampling_rate*hps_result[max_hps_result]) / harmonic_number
+    fundamental_frequency = (sampling_rate*max_hps_result) / (recording.shape[0])
     window = recording.shape[0]/sampling_rate
     print("length of recording: ", len(recording))
     # fundamental_frequency = max_hps_result*(sampling_rate/window)/harmonic_number
