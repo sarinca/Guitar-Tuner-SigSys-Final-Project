@@ -56,8 +56,18 @@ def audio_record():
 #   return
 def Harmonic_Product_Spectrum(sig):
    
-
-   return harmonic_product_spectrum
+  length = math.ceil(sig.size/i+1)
+  sig_copy = copy.copy(sig) #due to unique behavior of the assignment statements
+   #multiplication & downsampling
+  safe_copy = copy.deepcopy(sig)
+  harmonic_product_spectrum = sig
+  for index in range(1,harmonic_number+1,1):
+   length = math.ceil(sig.size/index)
+   #potential place to debug
+   harmonic_product_spectrum_copy = np.multiply(harmonic_product_spectrum[:length],sig_copy[::index])
+   harmonic_product_spectrum = harmonic_product_spectrum_copy
+  
+  return harmonic_product_spectrum
 
 
 def compute_fft(recording, t): 
@@ -83,7 +93,7 @@ def continuous_running():
     max_hps_result = np.argmax(hps_result)
     fundamental_frequency = hps_result[max_hps_result] / harmonic_number
     print(fundamental_frequency)
-    Find_Closest_Note(fundamental_frequency)
+    Determine_Sharp_Flat(fundamental_frequency)
 
 
 
