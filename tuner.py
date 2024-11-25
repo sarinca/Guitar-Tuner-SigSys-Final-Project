@@ -2,6 +2,7 @@
 import sounddevice as sd
 import numpy as np
 import math
+import copy
 import matplotlib.pyplot as plt
 
 #defined variables
@@ -56,7 +57,7 @@ def audio_record():
 #   return
 def Harmonic_Product_Spectrum(sig):
    
-  length = math.ceil(sig.size/i+1)
+  # length = math.ceil(sig.size/i+1)
   sig_copy = copy.copy(sig) #due to unique behavior of the assignment statements
    #multiplication & downsampling
   safe_copy = copy.deepcopy(sig)
@@ -76,7 +77,7 @@ def compute_fft(recording, t):
     print("dft")
     print(dft)
     main_hum_suppression_index = 61 #main hum corresponds to outside noise which needs to get zerod out, typically occurs between 50 to 60 hz 
-    for  index in range(61+1):
+    for index in range(61+1):
        dft[index] = 0
     return dft
 
