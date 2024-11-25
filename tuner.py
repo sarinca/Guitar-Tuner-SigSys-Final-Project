@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 #defined variables
 Notes = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
 sampling_rate = 44100
-
+harmonic_number = 5
 #matching of guitar audios
 def Find_Closest_Note(Fin):
   Notes = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
@@ -54,12 +54,21 @@ def audio_record():
 #   plt.tight_layout()
 #   plt.show()
 #   return
+def Harmonic_Product_Spectrum(sig):
+   
 
-def compute_frequency(recording, t):
+   return harmonic_product_spectrum
+
+
+def compute_fft(recording, t): 
     dft = np.fft.fft(recording)
     dft = np.abs(dft)
     print("dft")
     print(dft)
+    main_hum_suppression_index = 61 #main hum corresponds to outside noise which needs to get zerod out, typically occurs between 50 to 60 hz 
+    for  index in range(61+1):
+       dft[index] = 0
+    return dft
 
 
 
@@ -67,9 +76,15 @@ def continuous_running():
   while (True):
   #print(sd.query_devices()) used for debugging purposes;
     recording, t = audio_record()
-    compute_frequency(recording, t)
+    transform = compute_fft(recording, t)
     # plot_graph(dft,recording, Time)
     #do all the work
+    hps_result = Harmonic_Product_Spectrum(transform)
+    max_hps_result = np.argmax(hps_result)
+    fundamental_frequency = hps_result[max_hps_result] / harmonic_number
+    print(fundamental_frequency)
+    Find_Closest_Note(fundamental_frequency)
+
 
 #   while (determinant == False):
 #     target = input("Please type in either S for start or Q for ending the program: s")
