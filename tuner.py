@@ -30,7 +30,7 @@ def Determine_Sharp_Flat(Fin):
 
 #recording audio
 def audio_record():
-    seconds = 1 #in seconds
+    seconds = 3 #in seconds
     sampling_rate = 48000
     audio = sd.rec(int(seconds*sampling_rate), samplerate=sampling_rate, channels = 1) 
     sd.wait()
