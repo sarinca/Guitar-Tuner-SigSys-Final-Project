@@ -86,6 +86,7 @@ def continuous_running():
     Find_Closest_Note(fundamental_frequency)
 
 
+
 #   while (determinant == False):
 #     target = input("Please type in either S for start or Q for ending the program: s")
 #     if (target.lower() == 's'):
