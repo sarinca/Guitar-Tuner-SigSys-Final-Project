@@ -8,14 +8,14 @@ import matplotlib.pyplot as plt
 #defined variables
 Notes = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
 sampling_rate = 44100
-harmonic_number = 4
+harmonic_number = 3
 #matching of guitar audios
 def Find_Closest_Note(Fin):
   Notes = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
   Concert_Pitch = 440 #Hz
-  x = round(12*math.log2(Fin/Concert_Pitch))
+  x = round(12*math.log2(Fin/Concert_Pitch) + 69)
   Note = Notes[x%12]
-  closest_pitch = round(Concert_Pitch*pow(2,(x/12)), 2)
+  closest_pitch = round(Concert_Pitch*pow(2,((x-69)/12)), 2)
   return Note, closest_pitch
 
 def Determine_Sharp_Flat(Fin):
@@ -32,7 +32,7 @@ def Determine_Sharp_Flat(Fin):
 #recording audio
 def audio_record():
     seconds = 2 #in seconds
-    sampling_rate = 44100
+    sampling_rate = 48000
     print("Start new recording. Play your note and wait for recording to finish")
     audio = sd.rec(int(seconds*sampling_rate), samplerate=sampling_rate, channels = 1) #maybe need to change channels to 1
     sd.wait()
@@ -67,7 +67,7 @@ def Harmonic_Product_Spectrum(sig):
    #multiplication & downsampling
   harmonic_product_spectrum = copy.deepcopy(sig)
   for index in range(1,harmonic_number+1,1):
-   length = int(np.ceil(sig.size/index))
+   length = int(np.ceil(len(sig)/index))
    #potential place to debug
    #harmonic_product_spectrum_copy = np.multiply(harmonic_product_spectrum[:length],sig_copy[::index])
   #  print(harmonic_product_spectrum[:length])
@@ -93,8 +93,9 @@ def compute_fft(recording, t):
     # print("dft")
     # print(dft)
     main_hum_suppression_index = 61 #main hum corresponds to outside noise which needs to get zerod out, typically occurs between 50 to 60 hz 
-    for index in range(61+1):
-      dft[index] = 0
+    # for index in range(61+1):
+    #   dft[index] = 0
+    dft = dft[:int(len(dft)/2)]
     return dft
 
 
@@ -109,7 +110,19 @@ def continuous_running():
     # plot_graph(dft,recording, Time)
     #do all the work
     hps_result = Harmonic_Product_Spectrum(transform)
-    max_hps_result = np.argmax(hps_result)
+    
+    frequencies = np.fft.fftfreq(int((len(hps_result)*2)/1), 1. / sampling_rate)
+    
+    # set magnitude of all frequencies below 60Hz to zero
+    for i, freq in enumerate(frequencies):
+      if freq > 60:
+        hps_result[:i - 1] = 0
+        break
+    
+    max_hps_result = round(frequencies[np.argmax(hps_result)], 2)
+    
+    print("loudest frequency (allegeldy)\n", max_hps_result)
+    
     fundamental_frequency = max_hps_result * (48000/len(recording)) / harmonic_number
     print("max hps: ", max_hps_result)
     #fundamental_frequency = (sampling_rate*hps_result[max_hps_result]) / harmonic_number
@@ -119,7 +132,7 @@ def continuous_running():
     # fundamental_frequency = max_hps_result*(sampling_rate/window)/harmonic_number
     print("fundamental freq")
     print(fundamental_frequency)
-    Determine_Sharp_Flat(fundamental_frequency)
+    Determine_Sharp_Flat(max_hps_result)
 
 
 
