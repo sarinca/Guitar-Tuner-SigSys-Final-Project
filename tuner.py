@@ -13,9 +13,9 @@ harmonic_number = 3
 def Find_Closest_Note(Fin):
   Notes = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
   Concert_Pitch = 440 #Hz
-  x = round(12*math.log2(Fin/Concert_Pitch) + 69)
+  x = round(12*math.log2(Fin/Concert_Pitch))
   Note = Notes[x%12]
-  closest_pitch = round(Concert_Pitch*pow(2,((x-69)/12)), 2)
+  closest_pitch = round(Concert_Pitch*pow(2,((x)/12)), 2)
   return Note, closest_pitch
 
 def Determine_Sharp_Flat(Fin):
@@ -31,7 +31,7 @@ def Determine_Sharp_Flat(Fin):
 
 #recording audio
 def audio_record():
-    seconds = 2 #in seconds
+    seconds = 1 #in seconds
     sampling_rate = 48000
     print("Start new recording. Play your note and wait for recording to finish")
     audio = sd.rec(int(seconds*sampling_rate), samplerate=sampling_rate, channels = 1) #maybe need to change channels to 1
@@ -61,40 +61,21 @@ def audio_record():
 #   plt.show()
 #   return
 def Harmonic_Product_Spectrum(sig):
-   
-  # length = math.ceil(sig.size/i+1)
-  sig_copy = copy.copy(sig) #due to unique behavior of the assignment statements
-   #multiplication & downsampling
-  harmonic_product_spectrum = copy.deepcopy(sig)
-  for index in range(1,harmonic_number+1,1):
-   length = int(np.ceil(len(sig)/index))
-   #potential place to debug
-   #harmonic_product_spectrum_copy = np.multiply(harmonic_product_spectrum[:length],sig_copy[::index])
-  #  print(harmonic_product_spectrum[:length])
-  #  print(sig_copy[::index])
-   harmonic_product_spectrum[:length] *= sig_copy[::index]
   
+  harmonic_product_spectrum = copy.deepcopy(sig)
+  for index in range(2, harmonic_number + 1):
+    downsampled = sig[::index]
+    harmonic_product_spectrum[:len(downsampled)] *= downsampled
+
   return harmonic_product_spectrum
 
 
-def compute_fft(recording, t): 
-    # window = np.hanning(len(recording))
-    # recording_windowed = recording.flatten() * window
+def compute_fft(recording): 
     dft = np.fft.fft(recording)
     dft = abs(dft)
-    # frequency_bins = np.fft.fftfreq(len(recording), d=1/sampling_rate)
-    # magnitude_spectrum = np.abs(np.fft.fft(recording.flatten()))
-    # print("Frequency Bins:", frequency_bins[:10])  # Print first 10 frequency bins
-    # print("Magnitude Spectrum:", magnitude_spectrum[:10])  # Print first 10 magnitudes
-    # magnitude_spectrum[:int(50 * len(recording) / sampling_rate)] = 0  # Remove below 50 Hz
-    # max_index = np.argmax(magnitude_spectrum)
-    # fundamental_frequency = abs(frequency_bins[max_index])
-    # print("Fundamental Frequency from FFT:", fundamental_frequency)
-    # print("dft")
-    # print(dft)
-    main_hum_suppression_index = 61 #main hum corresponds to outside noise which needs to get zerod out, typically occurs between 50 to 60 hz 
-    # for index in range(61+1):
-    #   dft[index] = 0
+
+    for index in range(61+1):
+      dft[index] = 0
     dft = dft[:int(len(dft)/2)]
     return dft
 
@@ -104,46 +85,22 @@ def continuous_running():
   while (True):
   #print(sd.query_devices()) used for debugging purposes;
     recording = audio_record()
-    transform = compute_fft(recording)
+    transform = compute_fft(recording.flatten())
     print("dft array")
     print(transform)
     # plot_graph(dft,recording, Time)
-    #do all the work
     hps_result = Harmonic_Product_Spectrum(transform)
     
-    frequencies = np.fft.fftfreq(int((len(hps_result)*2)/1), 1. / sampling_rate)
+    frequencies = np.fft.fftfreq(int((len(hps_result)*2)/1), 1 / sampling_rate)[:len(transform)]
+    valid_indices = frequencies > 60
+    hps_result[~valid_indices] = 0
     
-    # set magnitude of all frequencies below 60Hz to zero
-    for i, freq in enumerate(frequencies):
-      if freq > 60:
-        hps_result[:i - 1] = 0
-        break
+    max_index = np.argmax(hps_result)
+    fundamental_frequency = frequencies[max_index]
     
-    max_hps_result = round(frequencies[np.argmax(hps_result)], 2)
-    
-    print("loudest frequency (allegeldy)\n", max_hps_result)
-    
-    fundamental_frequency = max_hps_result * (48000/len(recording)) / harmonic_number
-    print("max hps: ", max_hps_result)
-    #fundamental_frequency = (sampling_rate*hps_result[max_hps_result]) / harmonic_number
-    # fundamental_frequency = (sampling_rate*max_hps_result) / len(recording)
-    window = recording.shape[0]/sampling_rate
-    print("length of recording: ", len(recording))
-    # fundamental_frequency = max_hps_result*(sampling_rate/window)/harmonic_number
     print("fundamental freq")
-    print(fundamental_frequency)
-    Determine_Sharp_Flat(max_hps_result)
-
-
-
-#   while (determinant == False):
-#     target = input("Please type in either S for start or Q for ending the program: s")
-#     if (target.lower() == 's'):
-#       determinant = True
-#       continuous_running(determinant)
-#     if (target.lower() == 'q'):
-#       print("Exitting program")
-#       return
+    print(fundamental_frequency+40)
+    Determine_Sharp_Flat(fundamental_frequency+40)
     
 continuous_running() 
     
