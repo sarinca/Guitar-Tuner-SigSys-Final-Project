@@ -34,34 +34,13 @@ def audio_record():
     seconds = 1 #in seconds
     sampling_rate = 48000
     print("Start new recording. Play your note and wait for recording to finish")
-    audio = sd.rec(int(seconds*sampling_rate), samplerate=sampling_rate, channels = 1) #maybe need to change channels to 1
+    audio = sd.rec(int(seconds*sampling_rate), samplerate=sampling_rate, channels = 1) 
     sd.wait()
-    #Time = np.linspace(0,seconds, len(audio))
     print("finished recording")
     sd.play(audio, sampling_rate)
     return audio
 
-# def plot_graph(fourier, aud,t):
-#   fig = plt.subplot(2,1,1)
-# #plot the time domain graph
-#   fig.plot(t,aud)
-#   fig.set_title("Time Domain Graph of Audio Recording")
-#   fig.set_xlabel("Time")
-#   fig.set_ylabel("Audio Recording")
-
-# #plot to the magnitude of the dft
-#   frequency = np.fft.fftfreq(len(aud), (1/sampling_rate))
-#   fig = plt.subplot(2,1,2)
-#   fig.plot(frequency, fourier)
-#   fig.set_title("Discrete Fourier Transfrom Magnitude")
-#   fig.set_xlabel("Frequency in Hz")
-#   fig.set_ylabel("Density/Magnitude")
-#   #presenting the 2 graphs
-#   plt.tight_layout()
-#   plt.show()
-#   return
 def Harmonic_Product_Spectrum(sig):
-  
   harmonic_product_spectrum = copy.deepcopy(sig)
   for index in range(2, harmonic_number + 1):
     downsampled = sig[::index]
@@ -83,12 +62,10 @@ def compute_fft(recording):
 
 def continuous_running():
   while (True):
-  #print(sd.query_devices()) used for debugging purposes;
     recording = audio_record()
     transform = compute_fft(recording.flatten())
     print("dft array")
     print(transform)
-    # plot_graph(dft,recording, Time)
     hps_result = Harmonic_Product_Spectrum(transform)
     
     frequencies = np.fft.fftfreq(int((len(hps_result)*2)/1), 1 / sampling_rate)[:len(transform)]
