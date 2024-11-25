@@ -112,7 +112,7 @@ def continuous_running():
     max_hps_result = np.argmax(hps_result)
     print("max hps: ", max_hps_result)
     #fundamental_frequency = (sampling_rate*hps_result[max_hps_result]) / harmonic_number
-    fundamental_frequency = (sampling_rate*max_hps_result) / (recording.shape[0])
+    fundamental_frequency = (sampling_rate*max_hps_result) / len(recording)
     window = recording.shape[0]/sampling_rate
     print("length of recording: ", len(recording))
     # fundamental_frequency = max_hps_result*(sampling_rate/window)/harmonic_number
