@@ -59,7 +59,7 @@ def compute_fft(recording):
 def string_input():
   string_tune = input("String that needs to be tuned: ")
   if string_tune == "E":
-    sampling_rate = 60000
+    sampling_rate = 59000
     return sampling_rate
   if string_tune == "e":
     sampling_rate = 47000
@@ -69,10 +69,10 @@ def string_input():
     sampling_rate = 48000
     return sampling_rate
   if string_tune == "G":
-    sampling_rate = 48400
+    sampling_rate = 49000
     return sampling_rate
   if string_tune == "D":
-    sampling_rate = 49000
+    sampling_rate = 51000
     return sampling_rate
   if string_tune == "A":
     sampling_rate = 55000
@@ -95,7 +95,8 @@ def continuous_running():
     max_index = np.argmax(hps_result)
     fundamental_frequency = frequencies[max_index]
     print(fundamental_frequency+20)
-    Determine_Sharp_Flat(fundamental_frequency+20)
+    if (fundamental_frequency + 20 ) < 600:
+      Determine_Sharp_Flat(fundamental_frequency+20)
     if keyboard.is_pressed('q') or keyboard.is_pressed('Q'):
       sampling_rate = string_input()
 
