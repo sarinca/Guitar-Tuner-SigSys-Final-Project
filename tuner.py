@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 #defined variables
 Notes = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
-sampling_rate = 44100
+#sampling_rate = 44100
 harmonic_number = 3
 #matching of guitar audios
 def Find_Closest_Note(Fin):
@@ -30,11 +30,13 @@ def Determine_Sharp_Flat(Fin):
 
 #recording audio
 def audio_record():
-    seconds = 3 #in seconds
-    sampling_rate = 48000
+    seconds = 1 #in seconds
+    sampling_rate = 47000
+    print("Start")
     audio = sd.rec(int(seconds*sampling_rate), samplerate=sampling_rate, channels = 1) 
     sd.wait()
-    sd.play(audio, sampling_rate)
+    print("end")
+    #sd.play(audio, sampling_rate)
     return audio
 
 def Harmonic_Product_Spectrum(sig):
@@ -50,8 +52,8 @@ def compute_fft(recording):
     dft = np.fft.fft(recording)
     dft = abs(dft)
 
-    for index in range(61+1):
-      dft[index] = 0
+    #for index in range(61+1):
+     # dft[index] = 0
     dft = dft[:int(len(dft)/2)]
     return dft
 
@@ -69,8 +71,23 @@ def continuous_running():
     
     max_index = np.argmax(hps_result)
     fundamental_frequency = frequencies[max_index]
-    Determine_Sharp_Flat(fundamental_frequency+40)
+    print(fundamental_frequency+20)
+    Determine_Sharp_Flat(fundamental_frequency+20)
+
+def continuous_running2():
+  while (True):
+    recording = audio_record()
+    transform = compute_fft(recording.flatten())
+    hps_result = Harmonic_Product_Spectrum(transform)
     
+    frequencies = np.fft.fftfreq(int((len(hps_result)*2)/1), 1 / sampling_rate)[:len(transform)]
+    valid_indices = frequencies > 80
+    hps_result[~valid_indices] = 0
+    
+    max_index = np.argmax(frequencies)
+    fundamental_frequency = max_index
+    Determine_Sharp_Flat(fundamental_frequency+20)
+
 continuous_running() 
     
   
