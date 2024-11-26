@@ -3,8 +3,7 @@ import sounddevice as sd
 import numpy as np
 import math
 import copy
-import matplotlib.pyplot as plt
-
+import keyboard
 #defined variables
 Notes = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
 #sampling_rate = 44100
@@ -29,7 +28,7 @@ def Determine_Sharp_Flat(Fin):
     print("Sharp")
 
 #recording audio
-def audio_record():
+def audio_record(sampling_rate):
     seconds = 1 #in seconds
     sampling_rate = 47000
     print("Start")
@@ -58,14 +57,39 @@ def compute_fft(recording):
     return dft
 
 
+def string_input():
+  string_tune = input("String that needs to be tuned: ")
+  if string_tune == "E":
+    sampling_rate = 60000
+    return sampling_rate
+  if string_tune == "e":
+    sampling_rate = 47000
+    return sampling_rate
+  string_tune = string_tune.capitalize()
+  if string_tune == "B":
+    sampling_rate = 48000
+    return sampling_rate
+  if string_tune == "G":
+    sampling_rate = 48400
+    return sampling_rate
+  if string_tune == "D":
+    sampling_rate = 49000
+    return sampling_rate
+  if string_tune == "A":
+    sampling_rate = 55000
+    return sampling_rate
+  else:
+    string_input()
+    return
 
 def continuous_running():
+  sampling_rate = string_input()
   while (True):
-    recording = audio_record()
+    recording = audio_record(sampling_rate)
     transform = compute_fft(recording.flatten())
     hps_result = Harmonic_Product_Spectrum(transform)
-    
-    frequencies = np.fft.fftfreq(int((len(hps_result)*2)/1), 1 / sampling_rate)[:len(transform)]
+    sampling_freq = 44100
+    frequencies = np.fft.fftfreq(int((len(hps_result)*2)/1), 1 / sampling_freq)[:len(transform)]
     valid_indices = frequencies > 60
     hps_result[~valid_indices] = 0
     
@@ -73,20 +97,10 @@ def continuous_running():
     fundamental_frequency = frequencies[max_index]
     print(fundamental_frequency+20)
     Determine_Sharp_Flat(fundamental_frequency+20)
+    if keyboard.is_pressed('q') or keyboard.is_pressed('Q'):
+      sampling_rate = string_input()
 
-def continuous_running2():
-  while (True):
-    recording = audio_record()
-    transform = compute_fft(recording.flatten())
-    hps_result = Harmonic_Product_Spectrum(transform)
-    
-    frequencies = np.fft.fftfreq(int((len(hps_result)*2)/1), 1 / sampling_rate)[:len(transform)]
-    valid_indices = frequencies > 80
-    hps_result[~valid_indices] = 0
-    
-    max_index = np.argmax(frequencies)
-    fundamental_frequency = max_index
-    Determine_Sharp_Flat(fundamental_frequency+20)
+
 
 continuous_running() 
     
