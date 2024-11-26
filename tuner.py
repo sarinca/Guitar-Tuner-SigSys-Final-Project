@@ -94,9 +94,9 @@ def continuous_running():
     
     max_index = np.argmax(hps_result)
     fundamental_frequency = frequencies[max_index]
-    print(fundamental_frequency+20)
     if (fundamental_frequency + 20 ) < 600:
-      Determine_Sharp_Flat(fundamental_frequency+20)
+      print(fundamental_frequency+20)
+    Determine_Sharp_Flat(fundamental_frequency+20)
     if keyboard.is_pressed('q') or keyboard.is_pressed('Q'):
       sampling_rate = string_input()
 
